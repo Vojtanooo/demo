@@ -1,4 +1,184 @@
 {% extends "base.html" %} {% block title %} Home Page {%endblock %}
 {% block content %}
-<p>this is the home page</p>
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Baterie Monitor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+
+    .container_new {  display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 10px 20px;
+    grid-auto-flow: row;
+    grid-template-areas:
+    "Info Graf"
+    "Ovladani Graf"
+    "Alarmy Graf";
+    justify-items: stretch;
+    align-content: center;
+    justify-content: center;
+    }
+    .Info { grid-area: Info; }
+    .Graf { grid-area: Graf; 
+        align-self: stretch; }
+    .Ovladani { grid-area: Ovladani;}
+    .Alarmy { grid-area: Alarmy; }
+
+    .container_v2 {
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  grid-template-rows: 1fr; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "div1 div2"; 
+    }
+    .div1 { grid-area: div1; }
+    .div2 { grid-area: div2; }
+
+    h2 {
+      color: #333;
+    }
+
+    #battery-info, #battery-graph, #control-panel, #alarms-errors {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    span {
+      font-weight: bold;
+      color: #007BFF;
+    }
+
+    select, input, button {
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #battery-graph {
+      height: 200px; 
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+    <br>
+    <div class="container_new">
+        <div class="Info" id="battery-info">
+            <h2>Baterie Informace</h2>
+            <p>Aktuální stav kapacity: <span id="capacity">80%</span></p>
+            <p>Nabíjení/Vybíjení: <span id="charging-status">Nabíjí</span></p>
+            <p>Výkon: <span id="power">10 kW</span></p>
+        </div>
+
+        <div class="Graf" id="battery-graph" style="height: auto;">
+            <h2>Historie Hodnot</h2>
+            <canvas id="myChart" height="330"></canvas>
+        </div>
+
+        <div class="Ovladani" id="control-panel">
+            <div class="container_v2">
+                <div class="div1">
+            <h2>Řízení Baterie</h2>
+            <label for="control-mode">Vyberte režim:</label>
+            <select id="control-mode" onchange="updatePowerVisibility()">
+                <option selected>-</option>
+            <option value="charge">Nabíjet</option>
+            <option value="discharge">Vybíjet</option>
+            <option value="peakshaving">Peak Shaving</option>
+            <option value="zero-current">Nulové Přetoky</option>
+            </select>
+                </div>
+                <div class="div2">
+            <label for="power-level" id="power-label" style="display:none;">Výkon:</label>
+            <input type="number" id="power-level" placeholder="Zadejte výkon (kW)" style="display:none;">
+            <button onclick="setControl()">Nastavit Řízení</button>
+        </div>
+        </div>
+        </div>
+
+        <div class="Alarmy" id="alarms-errors">
+            <h2>Alarmy a Chyby</h2>
+            <ul>
+            <li>Alarm 1: Nízká kapacita</li>
+            <li>Chyba 1: Neznámý problém</li>
+            </ul>
+        </div>
+    </div>
+  <script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+          datasets: [{
+            label: 'SOC',
+            borderColor: 'rgb(75, 192, 192)',
+            data: [0, 10, 12, 18, 20, 30, 75, 100],
+          }]
+        }
+      });
+
+    function updatePowerVisibility() {
+      const controlMode = document.getElementById('control-mode').value;
+      const powerLabel = document.getElementById('power-label');
+      const powerInput = document.getElementById('power-level');
+
+      if (controlMode === 'charge' || controlMode === 'discharge' || controlMode === 'peakshaving') {
+        powerLabel.style.display = 'block';
+        powerInput.style.display = 'block';
+      } else {
+        powerLabel.style.display = 'none';
+        powerInput.style.display = 'none';
+      }
+    }
+
+    function setControl() {
+      // Implementujte funkci pro nastavení řízení baterie na základě vybraného režimu a výkonu
+      const controlMode = document.getElementById('control-mode').value;
+      const powerLevel = document.getElementById('power-level').value;
+      // Provádějte potřebné akce na základě vybraného režimu a výkonu
+      console.log(`Nastaveno řízení - Režim: ${controlMode}, Výkon: ${powerLevel} kW`);
+    }
+  </script>
+
+</body>
+</html>
+
 {% endblock %}
