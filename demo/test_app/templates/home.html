@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <title>Baterie Monitor</title>
   <style>
     body {
@@ -107,7 +108,7 @@
             <p>Výkon: <span id="power">10 kW</span></p>
         </div>
 
-        <div class="Graf" id="battery-graph" style="height: auto;">
+        <div class="Graf" id="battery-graph" style="height: auto; width: auto;">
             <h2>Historie Hodnot</h2>
             <canvas id="myChart" height="330"></canvas>
         </div>
@@ -136,11 +137,15 @@
         <div class="Alarmy" id="alarms-errors">
             <h2>Alarmy a Chyby</h2>
             <ul>
+              <p>Random Number: <span id="random-number"></span></p>
+              <p>Random Number:</span>{{ number }}</p>
             <li>Alarm 1: Nízká kapacita</li>
             <li>Chyba 1: Neznámý problém</li>
             </ul>
         </div>
     </div>
+
+
   <script>
     var ctx = document.getElementById('myChart').getContext('2d');
       var myChart = new Chart(ctx, {
@@ -170,12 +175,32 @@
     }
 
     function setControl() {
-      // Implementujte funkci pro nastavení řízení baterie na základě vybraného režimu a výkonu
       const controlMode = document.getElementById('control-mode').value;
       const powerLevel = document.getElementById('power-level').value;
-      // Provádějte potřebné akce na základě vybraného režimu a výkonu
       console.log(`Nastaveno řízení - Režim: ${controlMode}, Výkon: ${powerLevel} kW`);
     }
+    $(document).ready(function() {
+        console.log('jQuery version:', $.fn.jquery);
+    });
+    function updateRandomNumber() {
+      jQuery.ajax({
+            url: '{% url "get_random_number" %}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                $('#random-number').text(data.number);
+            },
+            error: function(error) {
+                console.error('Error fetching random number:', error);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        console.log('jQuery version:', $.fn.jquery);
+
+        setInterval(updateRandomNumber, 5000);
+    });
   </script>
 
 </body>
