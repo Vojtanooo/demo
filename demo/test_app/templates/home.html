@@ -159,12 +159,11 @@
         </div>
       </div>
     </div>
-
+    <div id="randomNumbers"></div>
     <div class="Alarmy" id="alarms-errors">
       <h2>Alarmy a Chyby</h2>
       <ul>
-        <p>Random Number: <span id="random-number"></span></p>
-        <p>Random Number:</span>{{ number }}</p>
+        <p id="random-number"></p>
         <li>Alarm 1: Nízká kapacita</li>
         <li>Chyba 1: Neznámý problém</li>
       </ul>
@@ -208,25 +207,21 @@
     $(document).ready(function () {
       console.log('jQuery version:', $.fn.jquery);
     });
-    function updateRandomNumber() {
-      jQuery.ajax({
-        url: '{% url "get_random_number" %}',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-          $('#random-number').text(data.number);
-        },
-        error: function (error) {
-          console.error('Error fetching random number:', error);
+
+    async function updateRandomNumber() {
+            try {
+                const response = await fetch('/get_random_number');
+                const data = await response.json();
+
+                const randomNumberDisplay = document.getElementById('random-number');
+                randomNumberDisplay.innerHTML = `<p>Random Number: <span>${data.number}</span></p>`;
+            } catch (error) {
+                console.error('Error fetching random number:', error);
+            }
         }
-      });
-    }
 
-    $(document).ready(function () {
-      console.log('jQuery version:', $.fn.jquery);
-
-      setInterval(updateRandomNumber, 5000);
-    });
+        document.addEventListener('DOMContentLoaded', updateRandomNumber);
+        setInterval(updateRandomNumber, 5000);
   </script>
 
 </body>
