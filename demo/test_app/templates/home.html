@@ -129,9 +129,9 @@
   <div class="container_new">
     <div class="Info" id="battery-info">
       <h2>Baterie Informace</h2>
-      <p>Aktuální stav kapacity: <span id="capacity">80%</span></p>
-      <p>Nabíjení/Vybíjení: <span id="charging-status">Nabíjí</span></p>
-      <p>Výkon: <span id="power">10 kW</span></p>
+      <p id="capacity"></p>
+      <p id="power"></p>
+      <p id="charging-status"></p>
     </div>
 
     <div class="Graf" id="battery-graph" style="height: auto; width: auto;">
@@ -219,9 +219,33 @@
                 console.error('Error fetching random number:', error);
             }
         }
-
         document.addEventListener('DOMContentLoaded', updateRandomNumber);
         setInterval(updateRandomNumber, 5000);
+
+        async function updateDataFromDatabase() {
+            try {
+                const response = await fetch('/get_data_from_database');
+                const data = await response.json();
+                let power = data.actual_power;
+                let charge_discharge;
+                if (power > 0) {
+                    charge_discharge = 'Nabíjení';
+                } else {
+                    charge_discharge = 'Vybíjení';
+                }
+
+                const SocDisplay = document.getElementById('capacity');
+                const ActualPowerDisplay = document.getElementById('power');
+                const ChargingStatusDisplay = document.getElementById('charging-status');
+                SocDisplay.innerHTML = `<p>Kapacita: <span>${data.soc} %</span></p>`;
+                ActualPowerDisplay.innerHTML = `<p>Výkon: <span>${data.actual_power} kW</span></p>`;
+                ChargingStatusDisplay.innerHTML = `<p>Nabíjení/Vybíjení: <span>${charge_discharge}</span></p>`;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateDataFromDatabase);
+        setInterval(updateDataFromDatabase, 5000);
   </script>
 
 </body>
